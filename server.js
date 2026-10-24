@@ -22,44 +22,34 @@ app.post("/api/chat", async (req, res) => {
     });
   }
 
-  const startTime = Date.now();
-
   try {
-    console.log("Question received.");
-
     const stream = await ai.models.generateContentStream({
       model: "gemini-3.5-flash-lite",
-      contents: `You are StudyMate AI, a helpful student tutor.
-Answer simply and clearly in about 100 words.
-Question: ${question}`,
+      contents: `You are a direct, concise study tutor.
+Answer the student's question immediately.
+Do not greet the student.
+Do not introduce yourself.
+Never start with phrases like "Hey there", "Hello", "I'm StudyMate AI", or "I'd love to help".
+Start directly with the answer.
+Use simple language and examples when useful.
+Keep the answer around 100 words unless the question needs more detail.
+
+Student's question: ${question}`,
       config: {
-        maxOutputTokens: 300
+        maxOutputTokens: 400
       }
     });
 
     res.setHeader("Content-Type", "text/plain; charset=utf-8");
     res.setHeader("Cache-Control", "no-cache, no-transform");
 
-    let firstChunk = true;
-
     for await (const chunk of stream) {
       if (chunk.text) {
-        if (firstChunk) {
-          console.log(
-            "First text:",
-            Date.now() - startTime,
-            "ms"
-          );
-          firstChunk = false;
-        }
-
         res.write(chunk.text);
       }
     }
 
-    console.log("Total time:", Date.now() - startTime, "ms");
     res.end();
-
   } catch (error) {
     console.error("Gemini error:", error.message);
 
@@ -67,7 +57,7 @@ Question: ${question}`,
       res.end();
     } else {
       res.status(500).json({
-        error: "AI error: " + error.message
+        error: "AI response nahi mil paaya. Thodi der baad try karo."
       });
     }
   }
