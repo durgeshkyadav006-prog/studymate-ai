@@ -4,33 +4,106 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>StudyMate - AI Study Assistant</title>
+  <title>StudyMate AI</title>
   <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
 </head>
 <body>
-  <header>
-    <h1>🎓 StudyMate AI</h1>
-    <p>Your personal study assistant</p>
+  <header class="topbar">
+    <div class="brand-icon">S</div>
+    <div>
+      <h1>StudyMate AI</h1>
+      <p>Your smart study companion</p>
+    </div>
   </header>
 
-  <main>
-    <section class="card">
-      <h2>🤖 AI Study Assistant</h2>
-      <div id="chatBox">
-        <p><strong>StudyMate:</strong> Hello! What do you want to study today?</p>
+  <main class="container">
+    <section class="welcome">
+      <span class="eyebrow">YOUR AI STUDY PARTNER</span>
+      <h2>Learn smarter, every day.</h2>
+      <p>Ask a question, speak to StudyMate, or upload a photo of your question.</p>
+    </section>
+
+    <section class="card chat-card">
+      <div class="section-heading">
+        <div>
+          <h2>Ask StudyMate</h2>
+          <p>Get help with your studies</p>
+        </div>
+        <span class="status"><span></span> Ready</span>
       </div>
-      <input id="userInput" type="text" placeholder="Ask your study question...">
-      <button onclick="sendMessage()">Send</button>
+
+      <div id="chatBox" class="chat-box" aria-live="polite">
+        <div class="empty-state" id="emptyState">
+          <div class="empty-icon">✦</div>
+          <h3>What are you learning today?</h3>
+          <p>Type a question, use your voice, or add a question photo.</p>
+        </div>
+      </div>
+
+      <div id="imagePreview" class="image-preview" hidden>
+        <img id="previewImage" alt="Selected question">
+        <div class="preview-info">
+          <span>Question image attached</span>
+          <button type="button" id="removeImage" class="remove-image">Remove</button>
+        </div>
+      </div>
+
+      <form id="chatForm" class="composer">
+        <textarea id="userInput" rows="2"
+          placeholder="Type your question here..."
+          aria-label="Your question"></textarea>
+
+        <div class="composer-actions">
+          <div class="tool-buttons">
+            <button type="button" id="voiceButton" class="tool-button">
+              🎤 <span>Voice</span>
+            </button>
+
+            <label for="imageInput" class="tool-button file-button">
+              📷 <span>Camera / Photo</span>
+            </label>
+
+            <input
+              type="file"
+              id="imageInput"
+              accept="image/*"
+              capture="environment"
+              hidden
+            >
+          </div>
+
+          <button type="submit" id="sendButton" class="send-button">
+            Ask AI <span>➤</span>
+          </button>
+        </div>
+
+        <p id="voiceStatus" class="helper-text" aria-live="polite">
+          Voice search may require microphone permission.
+        </p>
+      </form>
     </section>
 
-    <section class="card">
-      <h2>📝 My Notes</h2>
-      <textarea id="notes" placeholder="Write or paste your notes here..."></textarea>
-      <button onclick="summarizeNotes()">Summarize Notes</button>
-      <div id="summary"></div>
+    <section class="card notes-card">
+      <div class="section-heading">
+        <div>
+          <h2>Quick Notes Summary</h2>
+          <p>Turn your notes into key points</p>
+        </div>
+        <span class="notes-icon">📝</span>
+      </div>
+
+      <textarea id="notes" class="notes-input"
+        placeholder="Paste your study notes here..."></textarea>
+
+      <button type="button" id="summarizeButton" class="secondary-button">
+        Summarize Notes
+      </button>
+
+      <div id="summary" class="summary" aria-live="polite"></div>
     </section>
+
+    <footer>StudyMate AI · Learn at your own pace</footer>
   </main>
-
-  <script src="script.js"></script>
 </body>
 </html>
