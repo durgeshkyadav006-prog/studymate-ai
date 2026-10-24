@@ -20,7 +20,7 @@ body {
   min-height: 100vh;
 }
 
-button, textarea {
+button, textarea, select {
   font: inherit;
 }
 
@@ -57,7 +57,7 @@ button:disabled {
   font-size: 28px;
 }
 
-.brand-ai {
+.brand-ai, .welcome h1 span {
   color: var(--primary);
 }
 
@@ -89,10 +89,6 @@ button:disabled {
 .welcome h1 {
   font-size: clamp(30px, 5vw, 44px);
   margin: 14px 0 0;
-}
-
-.welcome h1 span {
-  color: var(--primary);
 }
 
 .workspace, .notes-section {
@@ -220,8 +216,9 @@ textarea {
   box-shadow: none;
 }
 
-textarea:focus {
+textarea:focus, select:focus {
   border-color: var(--primary);
+  outline-color: #c8bdff;
 }
 
 .composer-actions {
@@ -235,7 +232,8 @@ textarea:focus {
 .tools {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 9px;
+  flex-wrap: wrap;
 }
 
 .icon-button {
@@ -257,8 +255,15 @@ textarea:focus {
   background: #e4ddff;
 }
 
-.mic-icon-button {
-  background: #f0edff;
+.voice-language {
+  height: 40px;
+  max-width: 110px;
+  padding: 0 7px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text);
+  background: white;
+  font-size: 13px;
 }
 
 .mic-icon-button.listening {
@@ -269,12 +274,8 @@ textarea:focus {
 }
 
 @keyframes mic-pulse {
-  0%, 100% {
-    box-shadow: 0 0 0 0 #d9302533;
-  }
-  50% {
-    box-shadow: 0 0 0 7px #d9302500;
-  }
+  0%, 100% { box-shadow: 0 0 0 0 #d9302533; }
+  50% { box-shadow: 0 0 0 7px #d9302500; }
 }
 
 .send-button {
@@ -377,5 +378,10 @@ footer {
 
   .message {
     max-width: 96%;
+  }
+
+  .voice-language {
+    max-width: 95px;
+    font-size: 12px;
   }
 }

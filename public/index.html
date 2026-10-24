@@ -9,7 +9,6 @@
   <link rel="stylesheet" href="style.css">
   <script src="script.js" defer></script>
 </head>
-
 <body>
   <header class="topbar">
     <a href="/" class="brand">
@@ -37,33 +36,23 @@
         <div id="emptyState" class="empty-state">
           <div class="empty-icon">💡</div>
           <h3>Kaise help kar sakta hoon?</h3>
-          <p>Example: भारत के संविधान को किसने बनाया?</p>
-
-          <button
-            class="suggestion"
-            type="button"
-            data-question="भारत के संविधान को किसने बनाया?"
-          >
-            भारत के संविधान को किसने बनाया?
+          <p>Example: What is Python?</p>
+          <button class="suggestion" type="button"
+            data-question="What is Python?">
+            What is Python?
           </button>
-
-          <button
-            class="suggestion"
-            type="button"
-            data-question="Explain photosynthesis in simple English."
-          >
-            Explain photosynthesis in simple English.
+          <button class="suggestion" type="button"
+            data-question="भारत के संविधान को किसने बनाया?">
+            भारत के संविधान को किसने बनाया?
           </button>
         </div>
       </div>
 
       <form id="chatForm" class="composer">
-        <textarea
-          id="userInput"
+        <textarea id="userInput"
           placeholder="Message StudyMate AI..."
           rows="2"
-          aria-label="Your question"
-        ></textarea>
+          aria-label="Your question"></textarea>
 
         <div id="imagePreview" class="image-preview" hidden>
           <img id="previewImage" alt="Selected question">
@@ -74,12 +63,8 @@
 
         <div class="composer-actions">
           <div class="tools">
-            <label
-              class="upload-button icon-button"
-              for="imageInput"
-              title="Add photo"
-              aria-label="Add photo"
-            >
+            <label class="upload-button icon-button"
+              for="imageInput" title="Add photo" aria-label="Add photo">
               <svg viewBox="0 0 24 24" width="23" height="23"
                 fill="none" stroke="currentColor" stroke-width="2"
                 stroke-linecap="round" stroke-linejoin="round"
@@ -90,21 +75,18 @@
               </svg>
             </label>
 
-            <input
-              id="imageInput"
-              type="file"
-              accept="image/*"
-              capture="environment"
-              hidden
-            >
+            <input id="imageInput" type="file"
+              accept="image/*" capture="environment" hidden>
 
-            <button
-              id="voiceButton"
-              type="button"
+            <select id="voiceLanguage" class="voice-language"
+              aria-label="Voice input language" title="Voice language">
+              <option value="en-IN">English</option>
+              <option value="hi-IN">हिंदी</option>
+            </select>
+
+            <button id="voiceButton" type="button"
               class="icon-button mic-icon-button"
-              aria-label="Speak your question"
-              title="Speak your question"
-            >
+              aria-label="Speak your question" title="Speak your question">
               <svg viewBox="0 0 24 24" width="23" height="23"
                 fill="none" stroke="currentColor" stroke-width="2"
                 stroke-linecap="round" stroke-linejoin="round"
@@ -136,17 +118,11 @@
     <section class="notes-section">
       <h2>📝 Quick Notes Summary</h2>
       <p>Apne notes paste karo aur important sentences nikalo.</p>
-
-      <textarea
-        id="notes"
-        rows="5"
-        placeholder="Yahan apne notes paste karo..."
-      ></textarea>
-
+      <textarea id="notes" rows="5"
+        placeholder="Yahan apne notes paste karo..."></textarea>
       <button id="summarizeButton" class="send-button" type="button">
         Summarize Notes
       </button>
-
       <div id="summary" class="summary" aria-live="polite"></div>
     </section>
 

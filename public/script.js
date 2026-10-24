@@ -11,6 +11,7 @@ const imageInput = document.getElementById("imageInput");
 const imagePreview = document.getElementById("imagePreview");
 const previewImage = document.getElementById("previewImage");
 const voiceButton = document.getElementById("voiceButton");
+const voiceLanguage = document.getElementById("voiceLanguage");
 const voiceStatus = document.getElementById("voiceStatus");
 
 function addMessage(label, text, className) {
@@ -79,16 +80,6 @@ document.getElementById("removeImage").addEventListener("click", () => {
 function resetMic() {
   isListening = false;
   voiceButton.classList.remove("listening");
-  voiceButton.innerHTML = `
-    <svg viewBox="0 0 24 24" width="23" height="23"
-      fill="none" stroke="currentColor" stroke-width="2"
-      stroke-linecap="round" stroke-linejoin="round"
-      aria-hidden="true">
-      <rect x="9" y="2" width="6" height="12" rx="3"/>
-      <path d="M5 10v2a7 7 0 0 0 14 0v-2"/>
-      <path d="M12 19v3"/>
-      <path d="M8 22h8"/>
-    </svg>`;
 }
 
 function startVoiceSearch() {
@@ -97,7 +88,7 @@ function startVoiceSearch() {
 
   if (!SpeechRecognition) {
     voiceStatus.textContent =
-      "Voice input supported nahi hai. Updated Chrome try karo.";
+      "Voice input supported nahi hai. Updated Chrome use karo.";
     return;
   }
 
@@ -107,37 +98,60 @@ function startVoiceSearch() {
   }
 
   recognition = new SpeechRecognition();
-  recognition.lang = "hi-IN";
+
+  // Selected language: English or Hindi
+  recognition.lang = voiceLanguage.value;
   recognition.interimResults = true;
   recognition.maxAlternatives = 1;
+  recognition.continuous = false;
+
+  let finalTranscript = "";
 
   isListening = true;
   voiceButton.classList.add("listening");
-  voiceStatus.textContent = "Sun raha hoon... Hindi mein bolo.";
+  voiceStatus.textContent =
+    voiceLanguage.value === "hi-IN"
+      ? "सुन रहा हूँ... हिंदी में बोलो।"
+      : "Listening... Speak in English.";
 
   recognition.onresult = (event) => {
-    let transcript = "";
+    let interimTranscript = "";
 
     for (let i = event.resultIndex; i < event.results.length; i++) {
-      transcript += event.results[i][0].transcript;
+      const result = event.results[i];
+
+      if (result.isFinal) {
+        finalTranscript += result[0].transcript;
+      } else {
+        interimTranscript += result[0].transcript;
+      }
     }
 
-    userInput.value = transcript;
+    // Show recognized speech while speaking
+    userInput.value = finalTranscript + interimTranscript;
   };
 
   recognition.onerror = (event) => {
-    if (event.error === "not-allowed") {
-      voiceStatus.textContent = "Microphone permission allow karo.";
-    } else {
-      voiceStatus.textContent =
-        "Voice input nahi mil paaya. Dobara try karo.";
-    }
+    const errors = {
+      "not-allowed": "Microphone permission allow karo.",
+      "no-speech": "Awaaz nahi mili. Dobara bolo.",
+      "network": "Voice recognition network error. Dobara try karo.",
+      "audio-capture": "Microphone nahi mil raha hai."
+    };
+
+    voiceStatus.textContent =
+      errors[event.error] || "Voice input nahi mil paaya. Dobara try karo.";
   };
 
   recognition.onend = () => {
     resetMic();
-    if (!voiceStatus.textContent.includes("permission")) {
-      voiceStatus.textContent = "Ab send button dabao.";
+
+    if (userInput.value.trim()) {
+      voiceStatus.textContent = "Voice text ready hai. Send dabao.";
+    } else if (!voiceStatus.textContent.includes("permission") &&
+               !voiceStatus.textContent.includes("error") &&
+               !voiceStatus.textContent.includes("nahi mil")) {
+      voiceStatus.textContent = "Dobara mic dabakar bol sakte ho.";
     }
   };
 
@@ -145,11 +159,22 @@ function startVoiceSearch() {
     recognition.start();
   } catch (error) {
     resetMic();
-    voiceStatus.textContent = "Mic start nahi ho paaya. Dobara try karo.";
+    voiceStatus.textContent = "Mic start nahi hua. Dobara try karo.";
   }
 }
 
 voiceButton.addEventListener("click", startVoiceSearch);
+
+voiceLanguage.addEventListener("change", () => {
+  if (isListening && recognition) {
+    recognition.stop();
+  }
+
+  voiceStatus.textContent =
+    voiceLanguage.value === "hi-IN"
+      ? "Voice language: हिंदी"
+      : "Voice language: English";
+});
 
 chatForm.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -214,7 +239,9 @@ chatForm.addEventListener("submit", async (event) => {
     });
 
     if (!response.ok) {
-      throw new Error(await response.text() || "AI request failed.");
+      throw new Error(
+        await response.text() || "AI request failed."
+      );
     }
 
     if (!response.body) {
