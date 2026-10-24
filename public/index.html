@@ -1,109 +1,162 @@
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>StudyMate AI</title>
+  <meta name="theme-color" content="#6c4cf1">
+  <title>StudyMate AI - Your Study Assistant</title>
   <link rel="stylesheet" href="style.css">
   <script src="script.js" defer></script>
 </head>
+
 <body>
   <header class="topbar">
-    <div class="brand-icon">S</div>
-    <div>
-      <h1>StudyMate AI</h1>
-      <p>Your smart study companion</p>
-    </div>
+    <a href="/" class="brand">
+      <span class="brand-icon">🎓</span>
+      <span>StudyMate <span class="brand-ai">AI</span></span>
+    </a>
+    <span class="language-tag">हिंदी • English • Hinglish</span>
   </header>
 
   <main class="container">
     <section class="welcome">
-      <span class="eyebrow">YOUR AI STUDY PARTNER</span>
-      <h2>Learn smarter, every day.</h2>
-      <p>Ask a question, speak to StudyMate, or upload a photo of your question.</p>
+      <div class="welcome-label">YOUR PERSONAL STUDY ASSISTANT</div>
+      <h1>Padhai ab hogi <span>Easy!</span></h1>
     </section>
 
-    <section class="card chat-card">
+    <section class="feature-grid">
+      <article class="feature-card">
+        <span class="feature-icon">⌨️</span>
+        <h3>Hindi Typing</h3>
+        <p>Hindi, English ya Hinglish mein sawaal poochho.</p>
+      </article>
+
+      <article class="feature-card">
+        <span class="feature-icon">🎤</span>
+        <h3>Voice Search</h3>
+        <p>Mic dabao aur Hindi mein sawaal bolo.</p>
+      </article>
+
+      <article class="feature-card">
+        <span class="feature-icon">📷</span>
+        <h3>Ask with Photo</h3>
+        <p>Question ki photo upload karke answer pao.</p>
+      </article>
+    </section>
+
+    <section class="workspace">
       <div class="section-heading">
         <div>
-          <h2>Ask StudyMate</h2>
-          <p>Get help with your studies</p>
+          <h2>Ask StudyMate AI</h2>
+          <p>Apna question neeche likho ya photo add karo.</p>
         </div>
-        <span class="status"><span></span> Ready</span>
+        <button id="clearChat" class="secondary-button" type="button">
+          Clear Chat
+        </button>
       </div>
 
       <div id="chatBox" class="chat-box" aria-live="polite">
-        <div class="empty-state" id="emptyState">
-          <div class="empty-icon">✦</div>
-          <h3>What are you learning today?</h3>
-          <p>Type a question, use your voice, or add a question photo.</p>
-        </div>
-      </div>
+        <div id="emptyState" class="empty-state">
+          <div class="empty-icon">💡</div>
+          <h3>Kaise help kar sakta hoon?</h3>
+          <p>Example: भारत के संविधान को किसने बनाया?</p>
 
-      <div id="imagePreview" class="image-preview" hidden>
-        <img id="previewImage" alt="Selected question">
-        <div class="preview-info">
-          <span>Question image attached</span>
-          <button type="button" id="removeImage" class="remove-image">Remove</button>
+          <button
+            class="suggestion"
+            type="button"
+            data-question="भारत के संविधान को किसने बनाया?"
+          >
+            भारत के संविधान को किसने बनाया?
+          </button>
+
+          <button
+            class="suggestion"
+            type="button"
+            data-question="Explain photosynthesis in simple English."
+          >
+            Explain photosynthesis in simple English.
+          </button>
         </div>
       </div>
 
       <form id="chatForm" class="composer">
-        <textarea id="userInput" rows="2"
-          placeholder="Type your question here..."
-          aria-label="Your question"></textarea>
+        <textarea
+          id="userInput"
+          placeholder="Apna question yahan likho... हिंदी या English"
+          rows="3"
+          aria-label="Your question"
+        ></textarea>
+
+        <div id="imagePreview" class="image-preview" hidden>
+          <img id="previewImage" alt="Selected question">
+          <button
+            id="removeImage"
+            type="button"
+            class="remove-image"
+          >
+            Remove photo ✕
+          </button>
+        </div>
 
         <div class="composer-actions">
-          <div class="tool-buttons">
-            <button type="button" id="voiceButton" class="tool-button">
-              🎤 <span>Voice</span>
-            </button>
-
-            <label for="imageInput" class="tool-button file-button">
-              📷 <span>Camera / Photo</span>
+          <div class="tools">
+            <label class="upload-button" for="imageInput">
+              📷 <span>Photo / Camera</span>
             </label>
 
             <input
-              type="file"
               id="imageInput"
+              type="file"
               accept="image/*"
               capture="environment"
               hidden
             >
+
+            <button
+              id="voiceButton"
+              type="button"
+              class="voice-button"
+            >
+              🎤 <span>Hindi Voice</span>
+            </button>
           </div>
 
-          <button type="submit" id="sendButton" class="send-button">
+          <button id="sendButton" type="submit" class="send-button">
             Ask AI <span>➤</span>
           </button>
         </div>
 
-        <p id="voiceStatus" class="helper-text" aria-live="polite">
-          Voice search may require microphone permission.
+        <p id="voiceStatus" class="status-text">
+          Hindi voice ke liye microphone permission allow karo.
         </p>
       </form>
     </section>
 
-    <section class="card notes-card">
-      <div class="section-heading">
-        <div>
-          <h2>Quick Notes Summary</h2>
-          <p>Turn your notes into key points</p>
-        </div>
-        <span class="notes-icon">📝</span>
-      </div>
+    <section class="notes-section">
+      <h2>📝 Quick Notes Summary</h2>
+      <p>Apne notes paste karo aur important sentences nikalo.</p>
 
-      <textarea id="notes" class="notes-input"
-        placeholder="Paste your study notes here..."></textarea>
+      <textarea
+        id="notes"
+        rows="5"
+        placeholder="Yahan apne notes paste karo..."
+      ></textarea>
 
-      <button type="button" id="summarizeButton" class="secondary-button">
+      <button
+        id="summarizeButton"
+        class="send-button"
+        type="button"
+      >
         Summarize Notes
       </button>
 
       <div id="summary" class="summary" aria-live="polite"></div>
     </section>
 
-    <footer>StudyMate AI · Learn at your own pace</footer>
+    <footer>
+      StudyMate AI • Learn smarter, every day.
+    </footer>
   </main>
 </body>
 </html>
