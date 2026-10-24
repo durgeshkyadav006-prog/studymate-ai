@@ -14,24 +14,62 @@ const ai = new GoogleGenAI({
 });
 
 app.post("/api/chat", async (req, res) => {
-  try {
-    const question = req.body.question;
+  const question = req.body.question?.trim();
 
-    if (!question) {
-      return res.status(400).json({ error: "Please enter a question." });
+  if (!question) {
+    return res.status(400).json({
+      error: "Please enter a question."
+    });
+  }
+
+  const startTime = Date.now();
+
+  try {
+    console.log("Question received.");
+
+    const stream = await ai.models.generateContentStream({
+      model: "gemini-3.5-flash-lite",
+      contents: `You are StudyMate AI, a helpful student tutor.
+Answer simply and clearly in about 100 words.
+Question: ${question}`,
+      config: {
+        maxOutputTokens: 300
+      }
+    });
+
+    res.setHeader("Content-Type", "text/plain; charset=utf-8");
+    res.setHeader("Cache-Control", "no-cache, no-transform");
+
+    let firstChunk = true;
+
+    for await (const chunk of stream) {
+      if (chunk.text) {
+        if (firstChunk) {
+          console.log(
+            "First text:",
+            Date.now() - startTime,
+            "ms"
+          );
+          firstChunk = false;
+        }
+
+        res.write(chunk.text);
+      }
     }
 
-    const response = await ai.models.generateContent({
-      model: "gemini-3.8-flash",
-      contents: `You are StudyMate AI, a helpful study assistant. Explain concepts simply for students. Answer this question: ${question}`
-    });
+    console.log("Total time:", Date.now() - startTime, "ms");
+    res.end();
 
-    res.json({ answer: response.text });
   } catch (error) {
-    console.error("AI error:", error.message);
-    res.status(500).json({
-      error: "AI response nahi mil paaya. API key aur server check karo."
-    });
+    console.error("Gemini error:", error.message);
+
+    if (res.headersSent) {
+      res.end();
+    } else {
+      res.status(500).json({
+        error: "AI error: " + error.message
+      });
+    }
   }
 });
 
