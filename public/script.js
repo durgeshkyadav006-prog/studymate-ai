@@ -12,7 +12,6 @@ const imagePreview = document.getElementById("imagePreview");
 const previewImage = document.getElementById("previewImage");
 const voiceButton = document.getElementById("voiceButton");
 const voiceStatus = document.getElementById("voiceStatus");
-const emptyState = document.getElementById("emptyState");
 
 function addMessage(label, text, className) {
   const message = document.createElement("div");
@@ -28,37 +27,34 @@ function addMessage(label, text, className) {
   message.append(heading, content);
   chatBox.appendChild(message);
 
-  if (emptyState) emptyState.hidden = true;
+  const empty = document.getElementById("emptyState");
+  if (empty) empty.hidden = true;
 
   chatBox.scrollTop = chatBox.scrollHeight;
-
   return content;
 }
 
 function fileToDataURL(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-
     reader.onload = () => resolve(reader.result);
     reader.onerror = () => reject(new Error("Image read nahi ho paayi."));
-
     reader.readAsDataURL(file);
   });
 }
 
 imageInput.addEventListener("change", async () => {
   const file = imageInput.files[0];
-
   if (!file) return;
 
   if (!file.type.startsWith("image/")) {
-    alert("Please select an image file.");
+    alert("Please select an image.");
     imageInput.value = "";
     return;
   }
 
   if (file.size > 6 * 1024 * 1024) {
-    alert("Image 6 MB se chhoti honi chahiye.");
+    alert("6 MB se chhoti image select karo.");
     imageInput.value = "";
     return;
   }
@@ -67,7 +63,7 @@ imageInput.addEventListener("change", async () => {
     selectedImage = await fileToDataURL(file);
     previewImage.src = selectedImage;
     imagePreview.hidden = false;
-    voiceStatus.textContent = "Image ready. Add a question or press Ask AI.";
+    voiceStatus.textContent = "Photo ready hai.";
   } catch (error) {
     alert(error.message);
   }
@@ -80,13 +76,28 @@ document.getElementById("removeImage").addEventListener("click", () => {
   imagePreview.hidden = true;
 });
 
+function resetMic() {
+  isListening = false;
+  voiceButton.classList.remove("listening");
+  voiceButton.innerHTML = `
+    <svg viewBox="0 0 24 24" width="23" height="23"
+      fill="none" stroke="currentColor" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round"
+      aria-hidden="true">
+      <rect x="9" y="2" width="6" height="12" rx="3"/>
+      <path d="M5 10v2a7 7 0 0 0 14 0v-2"/>
+      <path d="M12 19v3"/>
+      <path d="M8 22h8"/>
+    </svg>`;
+}
+
 function startVoiceSearch() {
   const SpeechRecognition =
     window.SpeechRecognition || window.webkitSpeechRecognition;
 
   if (!SpeechRecognition) {
     voiceStatus.textContent =
-      "Voice search supported nahi hai. Updated Chrome try karo.";
+      "Voice input supported nahi hai. Updated Chrome try karo.";
     return;
   }
 
@@ -96,14 +107,13 @@ function startVoiceSearch() {
   }
 
   recognition = new SpeechRecognition();
-  recognition.lang = "en-IN";
+  recognition.lang = "hi-IN";
   recognition.interimResults = true;
   recognition.maxAlternatives = 1;
-  isListening = true;
 
-  voiceButton.disabled = false;
-  voiceButton.innerHTML = "🔴 <span>Listening...</span>";
-  voiceStatus.textContent = "Ab apna question bolo...";
+  isListening = true;
+  voiceButton.classList.add("listening");
+  voiceStatus.textContent = "Sun raha hoon... Hindi mein bolo.";
 
   recognition.onresult = (event) => {
     let transcript = "";
@@ -116,24 +126,26 @@ function startVoiceSearch() {
   };
 
   recognition.onerror = (event) => {
-    voiceStatus.textContent =
-      event.error === "not-allowed"
-        ? "Microphone permission allow karo."
-        : "Voice input nahi mil paaya. Dobara try karo.";
+    if (event.error === "not-allowed") {
+      voiceStatus.textContent = "Microphone permission allow karo.";
+    } else {
+      voiceStatus.textContent =
+        "Voice input nahi mil paaya. Dobara try karo.";
+    }
   };
 
   recognition.onend = () => {
-    isListening = false;
-    voiceButton.innerHTML = "🎤 <span>Voice</span>";
-    voiceStatus.textContent = "Voice input complete. Press Ask AI to submit.";
+    resetMic();
+    if (!voiceStatus.textContent.includes("permission")) {
+      voiceStatus.textContent = "Ab send button dabao.";
+    }
   };
 
   try {
     recognition.start();
   } catch (error) {
-    isListening = false;
-    voiceButton.innerHTML = "🎤 <span>Voice</span>";
-    voiceStatus.textContent = "Voice start nahi ho paayi. Dobara try karo.";
+    resetMic();
+    voiceStatus.textContent = "Mic start nahi ho paaya. Dobara try karo.";
   }
 }
 
@@ -153,7 +165,7 @@ chatForm.addEventListener("submit", async (event) => {
 
   addMessage(
     "You",
-    question || "Please solve the question in this image.",
+    question || "Photo mein diye gaye question ka answer do.",
     "user-message"
   );
 
@@ -161,18 +173,18 @@ chatForm.addEventListener("submit", async (event) => {
     const imageMessage = document.createElement("div");
     imageMessage.className = "message user-message";
 
-    const imageLabel = document.createElement("span");
-    imageLabel.className = "message-label";
-    imageLabel.textContent = "Attached image";
+    const label = document.createElement("span");
+    label.className = "message-label";
+    label.textContent = "Attached Photo";
 
     const image = document.createElement("img");
     image.src = imageForRequest;
     image.alt = "Uploaded question";
     image.style.maxWidth = "100%";
-    image.style.maxHeight = "180px";
+    image.style.maxHeight = "200px";
     image.style.borderRadius = "10px";
 
-    imageMessage.append(imageLabel, image);
+    imageMessage.append(label, image);
     chatBox.appendChild(imageMessage);
   }
 
@@ -184,7 +196,7 @@ chatForm.addEventListener("submit", async (event) => {
 
   const answerText = addMessage(
     "StudyMate AI",
-    "Thinking...",
+    "Answer taiyar ho raha hai...",
     "ai-message"
   );
 
@@ -202,12 +214,11 @@ chatForm.addEventListener("submit", async (event) => {
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(errorText || "AI request failed.");
+      throw new Error(await response.text() || "AI request failed.");
     }
 
     if (!response.body) {
-      throw new Error("Response stream unavailable.");
+      throw new Error("Response stream available nahi hai.");
     }
 
     answerText.textContent = "";
@@ -218,7 +229,6 @@ chatForm.addEventListener("submit", async (event) => {
 
     while (true) {
       const { value, done } = await reader.read();
-
       if (done) break;
 
       const chunk = decoder.decode(value, { stream: true });
@@ -233,7 +243,7 @@ chatForm.addEventListener("submit", async (event) => {
     answerText.textContent += decoder.decode();
 
     if (!receivedText && !answerText.textContent.trim()) {
-      answerText.textContent = "No answer received. Please try again.";
+      answerText.textContent = "Answer nahi mila. Dobara try karo.";
     }
   } catch (error) {
     answerText.textContent = "Error: " + error.message;
@@ -245,16 +255,41 @@ chatForm.addEventListener("submit", async (event) => {
   }
 });
 
+document.querySelectorAll(".suggestion").forEach((button) => {
+  button.addEventListener("click", () => {
+    userInput.value = button.dataset.question || "";
+    userInput.focus();
+  });
+});
+
+document.getElementById("clearChat").addEventListener("click", () => {
+  chatBox.replaceChildren();
+
+  const empty = document.createElement("div");
+  empty.id = "emptyState";
+  empty.className = "empty-state";
+
+  const icon = document.createElement("div");
+  icon.className = "empty-icon";
+  icon.textContent = "💡";
+
+  const heading = document.createElement("h3");
+  heading.textContent = "Ab apna question poochho!";
+
+  empty.append(icon, heading);
+  chatBox.appendChild(empty);
+});
+
 document.getElementById("summarizeButton").addEventListener("click", () => {
   const notes = document.getElementById("notes").value.trim();
   const summary = document.getElementById("summary");
 
   if (!notes) {
-    summary.textContent = "Please enter some notes first.";
+    summary.textContent = "Pehle apne notes paste karo.";
     return;
   }
 
-  const sentences = notes.match(/[^.!?\n]+[.!?]*/g) || [notes];
+  const sentences = notes.match(/[^.!?।\n]+[.!?।]*/g) || [notes];
   const words = notes.toLowerCase().match(/\b[a-z0-9]+\b/g) || [];
   const frequency = {};
 
@@ -283,11 +318,15 @@ document.getElementById("summarizeButton").addEventListener("click", () => {
 
   summary.textContent =
     ranked.map((item) => item.sentence).join(" ") ||
-    "No summary could be created.";
+    "Summary nahi ban paayi.";
 });
 
 userInput.addEventListener("keydown", (event) => {
-  if (event.key === "Enter" && !event.shiftKey && !event.isComposing) {
+  if (
+    event.key === "Enter" &&
+    !event.shiftKey &&
+    !event.isComposing
+  ) {
     event.preventDefault();
     chatForm.requestSubmit();
   }
