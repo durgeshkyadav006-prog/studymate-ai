@@ -1,0 +1,36 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StudyMate - AI Study Assistant</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>🎓 StudyMate AI</h1>
+    <p>Your personal study assistant</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>🤖 AI Study Assistant</h2>
+      <div id="chatBox">
+        <p><strong>StudyMate:</strong> Hello! What do you want to study today?</p>
+      </div>
+      <input id="userInput" type="text" placeholder="Ask your study question...">
+      <button onclick="sendMessage()">Send</button>
+    </section>
+
+    <section class="card">
+      <h2>📝 My Notes</h2>
+      <textarea id="notes" placeholder="Write or paste your notes here..."></textarea>
+      <button onclick="summarizeNotes()">Summarize Notes</button>
+      <div id="summary"></div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
