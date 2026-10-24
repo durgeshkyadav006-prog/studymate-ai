@@ -14,10 +14,18 @@ async function sendMessage() {
   chatBox.appendChild(userMessage);
 
   input.value = "";
+  input.disabled = true;
 
-  const loadingMessage = document.createElement("p");
-  loadingMessage.textContent = "StudyMate: Thinking...";
-  chatBox.appendChild(loadingMessage);
+  const answerMessage = document.createElement("p");
+  const answerLabel = document.createElement("strong");
+  answerLabel.textContent = "StudyMate: ";
+  answerMessage.appendChild(answerLabel);
+
+  const answerText = document.createElement("span");
+  answerText.textContent = "Thinking...";
+  answerMessage.appendChild(answerText);
+  chatBox.appendChild(answerMessage);
+
   chatBox.scrollTop = chatBox.scrollHeight;
 
   try {
@@ -29,19 +37,47 @@ async function sendMessage() {
       body: JSON.stringify({ question })
     });
 
-    const data = await response.json();
-
     if (!response.ok) {
-      throw new Error(data.error || "AI response failed.");
+      const errorText = await response.text();
+      throw new Error(errorText || "AI response failed.");
     }
 
-    loadingMessage.textContent = "StudyMate: " + data.answer;
-  } catch (error) {
-    loadingMessage.textContent =
-      "StudyMate: " + error.message;
-  }
+    if (!response.body) {
+      throw new Error("Response stream unavailable.");
+    }
 
-  chatBox.scrollTop = chatBox.scrollHeight;
+    answerText.textContent = "";
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let receivedText = false;
+
+    while (true) {
+      const { value, done } = await reader.read();
+
+      if (done) break;
+
+      const text = decoder.decode(value, { stream: true });
+
+      if (text) {
+        answerText.textContent += text;
+        receivedText = true;
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
+    }
+
+    answerText.textContent += decoder.decode();
+
+    if (!receivedText && !answerText.textContent) {
+      answerText.textContent = "No answer received. Please try again.";
+    }
+  } catch (error) {
+    answerText.textContent = "Error: " + error.message;
+  } finally {
+    input.disabled = false;
+    input.focus();
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
 }
 
 function summarizeNotes() {
@@ -85,7 +121,7 @@ function summarizeNotes() {
 }
 
 document.getElementById("userInput").addEventListener("keydown", event => {
-  if (event.key === "Enter") {
+  if (event.key === "Enter" && !event.isComposing) {
     sendMessage();
   }
 });
